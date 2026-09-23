@@ -1,5 +1,5 @@
 import { lstat, realpath } from "node:fs/promises"
-import { dirname, isAbsolute, resolve, sep } from "node:path"
+import { dirname, isAbsolute, sep } from "node:path"
 
 export type Screening = "read" | "tmp" | "review"
 
@@ -46,8 +46,8 @@ export async function screen(command: string, allowTmpWrites: boolean): Promise<
 
   // A small exception for literal local paths. No recursive deletion, options,
   // shell expansion, redirection, or service operation is covered by it.
-  if (allowTmpWrites && ["mkdir", "touch", "rm"].includes(verb) && args.length === 1 && !args[0].startsWith("-")) {
-    if (await insideTmp(resolve(args[0]), verb === "rm")) return "tmp"
+  if (allowTmpWrites && ["mkdir", "touch", "rm"].includes(verb) && args.length === 1 && isAbsolute(args[0])) {
+    if (await insideTmp(args[0], verb === "rm")) return "tmp"
   }
 
   if (!readCommands.has(verb) || forbiddenOption.test(command)) return "review"

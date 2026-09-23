@@ -11,6 +11,14 @@ const yes = async () => Response.json({ answers: { strictly_read_only: { type: "
 const no = async () => Response.json({ answers: { strictly_read_only: { type: "noul", noul: 0.4 } } })
 const settings = parseSettings({})
 
+test("default Jev threshold allows high-scoring reads and asks below it", async () => {
+  assert.equal(settings.readOnlyThreshold, 0.9)
+  const high = async () => Response.json({ answers: { strictly_read_only: { type: "noul", noul: 0.94 } } })
+  const low = async () => Response.json({ answers: { strictly_read_only: { type: "noul", noul: 0.84 } } })
+  assert.equal((await decide("pwd", "ask", settings, async () => "key", high)).effect, "allow")
+  assert.equal((await decide("pwd", "ask", settings, async () => "key", low)).effect, "ask")
+})
+
 test("Jev confirms a simple read and cannot override a configured deny", async () => {
   assert.equal((await decide("pwd", "ask", settings, async () => "key", yes)).effect, "allow")
   assert.equal((await decide("pwd", "deny", settings, async () => "key", yes)).effect, "deny")
@@ -39,10 +47,18 @@ test("literal /tmp writes work, outside paths and symlink escapes ask", async (t
   assert.equal(await screen(`touch ${directory}/new`, true), "tmp")
   assert.equal(await screen(`rm ${directory}/new`, true), "tmp")
   assert.equal(await screen(`rm ${directory}/new`, false), "review")
+  assert.equal(await screen("touch relative-file", true), "review")
+  assert.equal(await screen("mkdir relative-directory", true), "review")
+  const previousCwd = process.cwd()
+  try {
+    process.chdir("/tmp")
+    assert.equal(await screen("touch relative-file", true), "review")
+  } finally { process.chdir(previousCwd) }
   assert.equal(await screen("touch /tmp/../etc/file", true), "review")
   assert.equal(await screen("rm -rf /tmp", true), "review")
   await symlink("/etc", join(directory, "escape"))
   assert.equal(await screen(`touch ${directory}/escape/passwd`, true), "review")
+  assert.equal(await screen(`rm ${directory}/escape`, true), "tmp")
 })
 
 test("invalid options fail at startup", () => {

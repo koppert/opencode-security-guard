@@ -16,7 +16,7 @@ export function parseSettings(options: Record<string, unknown>): Settings {
   for (const key of Object.keys(options)) if (!allowed.has(key)) throw new Error(`security-guard: opção desconhecida: ${key}`)
   const allowTmpWrites = options.allowTmpWrites ?? true
   const timeoutMs = options.timeoutMs ?? 5000
-  const readOnlyThreshold = options.readOnlyThreshold ?? 0.98
+  const readOnlyThreshold = options.readOnlyThreshold ?? 0.9
   if (typeof allowTmpWrites !== "boolean") throw new Error("security-guard: allowTmpWrites deve ser boolean")
   if (typeof timeoutMs !== "number" || !Number.isInteger(timeoutMs) || timeoutMs < 100 || timeoutMs > 30000) throw new Error("security-guard: timeoutMs inválido")
   if (typeof readOnlyThreshold !== "number" || !Number.isFinite(readOnlyThreshold) || readOnlyThreshold < 0.5 || readOnlyThreshold > 1) throw new Error("security-guard: readOnlyThreshold inválido")

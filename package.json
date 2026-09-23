@@ -1,7 +1,7 @@
 {
   "name": "opencode-security-guard",
   "version": "0.1.0",
-  "description": "Jev-backed shell permission guard for OpenCode: allow verified read-only commands, ask for anything that can change state.",
+  "description": "Jev-assisted shell permission guard for OpenCode: approve simple reads and limited /tmp writes automatically.",
   "type": "module",
   "repository": {
     "type": "git",

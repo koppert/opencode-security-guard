@@ -1,27 +1,28 @@
-# Security Guard para OpenCode V2
+# Security Guard for OpenCode V2
 
-Este plugin revisa permissões de **comandos shell**. Comandos simples de consulta
-recebem `allow` quando o Jev confirma com probabilidade de pelo menos 0,98 que
-não alteram estado. Comandos que podem escrever arquivos, executar programas
-indiretos ou mudar processos e serviços recebem `ask`, inclusive quando alguma
-regra anterior os marcaria como `allow`. Um `deny` configurado continua valendo.
+This plugin reviews permissions for **shell commands**. Simple query commands
+receive `allow` when Jev confirms with at least 0.98 probability that they do not
+change state. Commands that may write files, execute programs indirectly, or
+change processes and services receive `ask`, even when an earlier rule would have
+marked them as `allow`. A configured `deny` still applies.
 
-Por padrão, `mkdir`, `touch` e `rm` com um único caminho literal dentro de `/tmp`
-são liberados. A verificação rejeita symlinks que apontam para fora de `/tmp`.
-Comandos compostos, opções e remoção recursiva continuam sujeitos a aprovação.
-Defina `allowTmpWrites: false` para desligar essa exceção.
+By default, `mkdir`, `touch`, and `rm` with a single literal path inside `/tmp`
+are allowed. The check rejects symlinks that point outside `/tmp`. Compound
+commands, options, and recursive deletion still require approval. Set
+`allowTmpWrites: false` to disable this exception.
 
-## Instalação
+## Installation
 
-Requer OpenCode V2 com `@opencode/plugin` 2.0.14. Instale dependências nesta pasta
-com `npm install` e referencie a pasta uma vez no `opencode.jsonc`:
+Requires OpenCode V2 with `@opencode/plugin` 2.0.14 or later. For local use,
+install dependencies in this folder with `npm install` and reference the folder;
+for npm use, reference the `opencode-security-guard` package. Local example:
 
 ```jsonc
 {
   "$schema": "https://opencode.ai/config.json",
   "plugins": [
     {
-      "package": "/caminho/absoluto/security-guard",
+      "package": "/absolute/path/security-guard",
       "options": {
         "allowTmpWrites": true,
         "timeoutMs": 5000,
@@ -35,16 +36,28 @@ com `npm install` e referencie a pasta uma vez no `opencode.jsonc`:
 }
 ```
 
-O plugin usa a conexão OpenRouter ativa do OpenCode ou `OPENROUTER_API_KEY`.
-Envia o texto do comando ao endpoint Jev (`typesafe/jev-1.13`). Sem credencial,
-em falha de rede, ou se o comando não puder ser verificado, pede aprovação.
-Os comandos não são armazenados pelo plugin. O classificador só recebe formas
-simples de comandos de consulta, nunca comandos arbitrários ou compostos.
+For npm, replace `"package"` with the package name:
 
-O plugin não altera permissões de ferramentas de edição, MCP ou outras ações.
-Os caminhos em `/tmp` são uma exceção para os três comandos descritos, não uma
-permissão geral de escrita. Shell e plugins têm a autoridade do processo OpenCode;
-teste a política no ambiente onde será usada. A pasta `security-guard-old` foi
-preservada como referência.
+```jsonc
+{
+  "plugins": [
+    {
+      "package": "opencode-security-guard",
+      "options": { "readOnlyThreshold": 0.98 }
+    }
+  ]
+}
+```
 
-Para verificar: `npm test` e `npm run typecheck`.
+The plugin uses OpenCode's active OpenRouter connection or `OPENROUTER_API_KEY`.
+It sends the command text to the Jev endpoint (`typesafe/jev-1.13`). Without a
+credential, on a network failure, or if the command cannot be verified, it asks
+for approval. The plugin does not store commands. The classifier only receives
+simple query command forms, never arbitrary or compound commands.
+
+The plugin does not change permissions for edit tools, MCP, or other actions.
+The `/tmp` paths are an exception for the three commands described above, not a
+general write permission. Shell and plugins have the authority of the OpenCode
+process; test the policy in the environment where it will be used.
+
+To verify: `npm test` and `npm run typecheck`.

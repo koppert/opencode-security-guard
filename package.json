@@ -1,7 +1,7 @@
 {
   "name": "opencode-security-guard",
   "version": "0.1.0",
-  "description": "Jev-assisted shell permission guard for OpenCode: approve simple reads and limited /tmp writes automatically.",
+  "description": "Linux-only OpenCode shell permission guard using Jev; auto-approves simple reads and limited /tmp writes.",
   "type": "module",
   "repository": {
     "type": "git",

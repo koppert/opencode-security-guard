@@ -13,6 +13,14 @@ a symlink inside `/tmp` even if its target is outside. Relative paths, compound
 commands, options, and recursive deletion require approval. Set
 `allowTmpWrites: false` to disable the exception.
 
+## Platform support
+
+This policy currently targets and has been tested only on Linux. The command
+filter assumes POSIX shell commands, and the `/tmp` exception expects `/tmp` to
+resolve to itself. On systems where `/tmp` resolves to another path, that
+exception falls back to `ask`. Windows shell syntax and paths are not supported;
+do not rely on automatic approvals there.
+
 ## Install from npm
 
 Add this entry to `opencode.jsonc` (or `opencode.json`):
